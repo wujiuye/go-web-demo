@@ -32,10 +32,23 @@ func main() {
 	http.HandleFunc("/memory", handleMemoryUsgApi)
 	http.HandleFunc("/storage", handleStorageUsgApi)
 	http.HandleFunc("/curl", handleCurlApi)
+	http.HandleFunc("/http_status", handleHttpStatusAPI)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		fmt.Println("Error starting server:", err)
 	}
+}
+
+func handleHttpStatusAPI(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+	status := r.URL.Query().Get("status")
+	statusCode, _ := strconv.Atoi(status)
+	w.WriteHeader(statusCode)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"code":0,"message":"success"}`))
 }
 
 func handleCurlApi(w http.ResponseWriter, r *http.Request) {
